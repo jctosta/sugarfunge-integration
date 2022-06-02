@@ -9,6 +9,8 @@ pub struct Config {
     pub chain_id: u64,
     pub moralis_base_url: String,
     pub moralis_api_key: String,
+    pub web3_node_url: String,
+    pub use_local_chain: bool,
 }
 
 pub fn init() -> Config { 
@@ -38,6 +40,14 @@ pub fn init() -> Config {
         moralis_api_key: match env::var("MORALIS_API_KEY") {
             Ok(var) => var,
             Err(_) => panic!("MORALIS_API_KEY {}", panic_message)
+        },
+        web3_node_url: match env::var("WEB3_NODE_URL") {
+            Ok(var) => var,
+            Err(_) => panic!("WEB3_NODE_URL {}", panic_message)
+        },
+        use_local_chain: match env::var("USE_LOCAL_CHAIN") {
+            Ok(var) => var.parse::<bool>().unwrap(),
+            Err(_) => panic!("USE_LOCAL_CHAIN {}", panic_message)
         },
     }
 }

@@ -1,5 +1,5 @@
-use ethcontract_generate::loaders::TruffleLoader;
-use ethcontract_generate::ContractBuilder;
+use ethcontract_generate::loaders::{TruffleLoader};
+use ethcontract_generate::{ContractBuilder};
 
 fn main() {
     let out_dir = std::env::var("OUT_DIR").unwrap();
@@ -8,7 +8,7 @@ fn main() {
         let dest = std::path::Path::new(&out_dir).join("SugarFungeAsset.rs");
 
         let artifact = TruffleLoader::new()
-            .load_from_file("./contracts/SugarFunge/SugarFungeAsset.json")
+            .load_from_file("./crates/truffle/build/contracts/SugarFungeAsset.json")
             .unwrap();
 
         for contract in artifact.iter() {
@@ -24,7 +24,7 @@ fn main() {
         let dest = std::path::Path::new(&out_dir).join("Wrapped1155Factory.rs");
 
         let artifact = TruffleLoader::new()
-            .load_from_file("./contracts/ErcWrapper/Wrapped1155Factory.json")
+            .load_from_file("./crates/truffle/build/contracts/Wrapped1155Factory.json")
             .unwrap();
 
         for contract in artifact.iter() {

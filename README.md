@@ -17,10 +17,15 @@ $ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 $ git clone git@github.com:SugarFunge/sugarfunge-integration.git
 ```
 
-- Compile the truffle contracts and copy the `build/contracts` folder to the root folder of this repository
+- Compile the hardhat contracts to generate the ABI json files:
+
 ```bash
-$ cd sugarfunge-integration
-$ cp $TRUFFLE_ROOT/build/contracts .
+# Navigate to hardhat root directory
+$ cd crates/truffle
+# Install hardhat dependencies
+$ yarn install
+# Compile the contracts
+$ yarn build
 ```
 
 - Copy the environment file as **.env** and make the changes based on your needs
@@ -36,7 +41,7 @@ $ cargo run
 $ cargo watch -x 'run --bin sugarfunge-integration'
 ```
 
-## Swagger API Documentation & Prometheus Server
+## Swagger API Documentation, Prometheus Server and Chainbridge Solidity
 
 ### Software requirements
 
@@ -51,9 +56,17 @@ $ cargo watch -x 'run --bin sugarfunge-integration'
 $ cp .env.example .env
 ```
 
-- Start the docker-compose file ([Access Swagger UI](http://localhost:7000)) ([Access Prometheus Server](http://localhost:9090))
+- Start the docker-compose file ([Access Swagger UI](http://localhost:7000)) ([Access Prometheus Server](http://localhost:9090) ([Ganache-cli RPC URL](http://localhost:8545)))
 ```bash
 $ docker-compose up -d
+```
+
+This will spin up a local blockchain network based on ganache-cli and deploy all chainbridge contracts to the local chain.
+
+You can check get the chainbridge contract addresses by using the logs feature of docker compose:
+
+```bash
+docker compose logs chainbridge-deploy
 ```
 
 - Stop the docker-compose file
@@ -66,14 +79,16 @@ $ docker-compose down
 - Default environment file: **.env**
 - Example environment file: **.env.example**
 
-| Variable Name               | Description                                 |
-| --------------------------- | ------------------------------------------- |
-| RUST_LOG                    | Rust log level                              |
-| RUST_BACKTRACE              | Show Rust backtrace (0 or 1)                |
-| LISTEN_URL                  | API Listen URL                              |
-| INFURA_PROJECT_ID           | Infura Project ID                           |
-| PRIVATE_KEY                 | Private Key used to interact with contracts |
-| CHAIN_ID                    | Chain ID (Default: 3 / Ropsten testnet)     |
-| MORALIS_BASE_URL            | Moralis API base URL                        |
-| MORALIS_API_KEY             | Moralis API Key                             |
-| SWAGGER_JSON                | Swagger json file path inside the container |
+| Variable Name     | Description                                 |
+|-------------------|---------------------------------------------|
+| RUST_LOG          | Rust log level                              |
+| RUST_BACKTRACE    | Show Rust backtrace (0 or 1)                |
+| LISTEN_URL        | API Listen URL                              |
+| WEB3_NODE_URL     | HTTP RPC node URL                           |
+| USE_LOCAL_CHAIN   | True == ganache-cli / False == infura       |
+| INFURA_PROJECT_ID | Infura Project ID                           |
+| PRIVATE_KEY       | Private Key used to interact with contracts |
+| CHAIN_ID          | Chain ID (Default: 3 / Ropsten testnet)     |
+| MORALIS_BASE_URL  | Moralis API base URL                        |
+| MORALIS_API_KEY   | Moralis API Key                             |
+| SWAGGER_JSON      | Swagger json file path inside the container |

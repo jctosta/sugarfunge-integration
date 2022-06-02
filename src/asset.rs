@@ -42,11 +42,19 @@ pub struct AssetBatchTransfer {
 
 pub fn get_web3(config: &Config) -> Result<Web3<Http>, ApiError> {
 
-    let infura_url = {
-        format!("https://ropsten.infura.io/v3/{}", config.project_id)
-    };
+    let mut web3_url: String;
+    if config.use_local_chain {
+        web3_url = {
+            format!("{}", config.web3_node_url)
+        };
+    } else {
+        // concat infura url with project id
+        web3_url = {
+            format!("{}{}", config.web3_node_url, config.project_id)
+        };
+    }
 
-    match Http::new(&infura_url) {
+    match Http::new(&web3_url) {
         Ok(http) => Ok(Web3::new(http)),
         Err(_) => Err(ApiError::TransportError),
     }

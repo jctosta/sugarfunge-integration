@@ -18,3 +18,21 @@ services:
         - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  ganache-cli:
+    ports:
+      - '8545:8545'
+    image: 'trufflesuite/ganache-cli:latest'
+    restart: always
+    command: '--mnemonic "field harbor junk ship this damp amateur meat cushion odor
+      above attend" --db ~/ganachedb --gasLimit 10000000 --accounts 10'
+    volumes:
+      - /tmp/ganachedb:/tmp/ganachedb
+  chainbridge-deploy:
+    image: chainbridge-deploy
+    build:
+      context: .
+      dockerfile: chainbridge-deploy.Dockerfile
+    restart: on-failure
+    command: "--url http://ganache-cli:8545 deploy --all --relayerThreshold 1 --privateKey 0x33594714d7f3e47c7606e5c68fffe73a62cd0c45be0abc8f25ed606e17651224"
+    links:
+      - ganache-cli

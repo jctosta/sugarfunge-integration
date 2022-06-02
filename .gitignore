@@ -2,3 +2,6 @@
 /contracts
 .vscode
 .env
+/crates/truffle/build/
+/crates/truffle/node_modules/
+.idea
