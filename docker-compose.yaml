@@ -14,8 +14,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: always
-    ports: 
-        - "9090:9090"
+    ports:
+      - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
   ganache-cli:
@@ -23,8 +23,7 @@ services:
       - '8545:8545'
     image: 'trufflesuite/ganache-cli:latest'
     restart: always
-    command: '--mnemonic "field harbor junk ship this damp amateur meat cushion odor
-      above attend" --db ~/ganachedb --gasLimit 10000000 --accounts 10'
+    command: '--mnemonic "field harbor junk ship this damp amateur meat cushion odor above attend" --db ~/ganachedb --gasLimit 10000000 --accounts 10'
     volumes:
       - /tmp/ganachedb:/tmp/ganachedb
   chainbridge-deploy:
@@ -36,3 +35,15 @@ services:
     command: "--url http://ganache-cli:8545 deploy --all --relayerThreshold 1 --privateKey 0x33594714d7f3e47c7606e5c68fffe73a62cd0c45be0abc8f25ed606e17651224"
     links:
       - ganache-cli
+
+  sf-deploy:
+    build:
+      context: .
+      dockerfile: sugarfunge-deploy.Dockerfile
+    env_file:
+      - ./.env
+    depends_on:
+      - ganache-cli
+    links:
+      - ganache-cli
+    command: "docker_deploy"
