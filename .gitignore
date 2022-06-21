@@ -4,4 +4,6 @@
 .env
 /crates/truffle/build/
 /crates/truffle/node_modules/
+/crates/bridge-test/node_modules
 .idea
+out
