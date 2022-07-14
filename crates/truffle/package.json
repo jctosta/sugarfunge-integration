@@ -3,7 +3,7 @@
     "build": "npx truffle compile",
     "network": "npx ganache-cli -h 0.0.0.0 -p 8545 -d -m \"field harbor junk ship this damp amateur meat cushion odor above attend\" --db ~/ganachedb",
     "deploy": "npx truffle migrate --reset",
-    "docker_deploy": "npx truffle migrate --reset --network docker_ganache"
+    "docker_deploy": "npx truffle migrate --reset --network docker_geth"
   },
   "devDependencies": {
     "@openzeppelin/truffle-upgrades": "^1.11.0"

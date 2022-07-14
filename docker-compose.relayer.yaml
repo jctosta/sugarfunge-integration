@@ -1,0 +1,12 @@
+version: '3.6'
+
+services:
+
+  # # Bridge Relayer Chain 
+  relayer-chain:
+    image: "chainsafe/chainbridge"
+    container_name: relayer-chain
+    command: [ "--testkey", "alice", "latest" ]
+    volumes:
+      - './crates/relayer/config.json:/config.json'
+    network_mode: host

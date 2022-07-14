@@ -46,8 +46,8 @@ module.exports = {
       port: 7545,            // Standard Ethereum port (default: none)
       network_id: "*",       // Any network (default: none)
     },
-    docker_ganache: {
-      host: "ganache-cli",     // Localhost (default: none)
+    docker_geth: {
+      host: "172.17.0.1",     // Localhost (default: none)
       port: 8545,            // Standard Ethereum port (default: none)
       network_id: "*",       // Any network (default: none)
     },

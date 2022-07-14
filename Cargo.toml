@@ -18,9 +18,9 @@ serde_json = "1"
 dotenv = "0.15.0"
 snailquote = "0.3.1"
 derive_more = "0.99.17"
-env_logger = "0.8"
+env_logger = "0.9"
 log = "0.4"
-ethcontract = { version = "0.15.4" }
+ethcontract = { version = "0.17.0" }
 
 [build-dependencies]
-ethcontract-generate = { version = "0.15.4" }
+ethcontract-generate = { version = "0.17.0" }

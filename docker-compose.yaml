@@ -1,49 +1,88 @@
 version: '3.6'
+
 services:
-  swagger:
-    image: swaggerapi/swagger-ui
-    ports:
-      - 7000:8080
-    restart: always
+
+  # TODO: REMOVE THIS , FOR TESTING PURPOSE ONLY
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest
     volumes:
-      - './swagger.json:/swagger.json'
-    environment:
-      SWAGGER_JSON: ${SWAGGER_JSON}
-  metrics:
-    image: 'prom/prometheus:latest'
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    restart: always
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-  ganache-cli:
+      - 9999:8080
+  # Bridge Main Chain
+  main-chain:
+    image: "chainsafe/chainbridge-geth:20200505131100-5586a65"
+    container_name: main-chain
+    network_mode: host
     ports:
-      - '8545:8545'
-    image: 'trufflesuite/ganache-cli:latest'
-    restart: always
-    command: '--mnemonic "field harbor junk ship this damp amateur meat cushion odor above attend" --db ~/ganachedb --gasLimit 10000000 --accounts 10'
-    volumes:
-      - /tmp/ganachedb:/tmp/ganachedb
+      - "8545:8545"
+      - "30303:30303"
+  # Bridge Main Chain Deployments via CLI
   chainbridge-deploy:
     image: chainbridge-deploy
     build:
       context: .
       dockerfile: chainbridge-deploy.Dockerfile
     restart: on-failure
-    command: "--url http://ganache-cli:8545 deploy --all --relayerThreshold 1 --privateKey 0x33594714d7f3e47c7606e5c68fffe73a62cd0c45be0abc8f25ed606e17651224"
+    command: "--url http://172.17.0.1:8545 deploy --all --relayerThreshold 1"
     links:
-      - ganache-cli
-
+      - main-chain
+  # Bridge Main Chain Deployments via Truffle
   sf-deploy:
+    image: sf-contracts-deployment
     build:
       context: .
       dockerfile: sugarfunge-deploy.Dockerfile
     env_file:
       - ./.env
     depends_on:
-      - ganache-cli
+      - main-chain
+      - chainbridge-deploy
     links:
-      - ganache-cli
+      - main-chain
     command: "docker_deploy"
+
+  # Substrate Chain 
+  sub-chain:
+    image: "chainsafe/chainbridge-substrate-chain:v1.3.0"
+    container_name: sub-chain
+    command: chainbridge-substrate-chain --dev --alice --ws-external --rpc-external
+    ports:
+      - "9944:9944"
+
+  chainbridge-register:
+    image: chainbridge-register
+    build:
+      context: .
+      dockerfile: chainbridge-deploy.Dockerfile
+    restart: on-failure
+    depends_on:
+      - chainbridge-deploy
+    links:
+      - main-chain
+    command: "--url http://172.17.0.1:8545 bridge register-resource --resourceId '0x000000000000000000000000000000c76ebe4a02bbc34786d860b355f5a5ce00' --targetContract '0x21605f71845f372A9ed84253d2D024B7B10999f4' --handler '0x3167776db165D8eA0f51790CA2bbf44Db5105ADF'"
+
+  chainbridge-set-burn:
+    image: chainbridge-set-burn
+    build:
+      context: .
+      dockerfile: chainbridge-deploy.Dockerfile
+    restart: on-failure
+    depends_on:
+      - chainbridge-deploy
+    links:
+      - main-chain
+    command: "--url http://172.17.0.1:8545 bridge set-burn --tokenContract '0x21605f71845f372A9ed84253d2D024B7B10999f4' --handler '0x3167776db165D8eA0f51790CA2bbf44Db5105ADF'"
+
+  chainbridge-add-minter:
+    image: chainbridge-add-minter
+    build:
+      context: .
+      dockerfile: chainbridge-deploy.Dockerfile
+    restart: on-failure
+    depends_on:
+      - chainbridge-deploy
+    links:
+      - main-chain
+    command: "--url http://172.17.0.1:8545 erc20 add-minter --minter '0x3167776db165D8eA0f51790CA2bbf44Db5105ADF'"
